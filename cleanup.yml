@@ -1,0 +1,49 @@
+- name: Clean up Docker containers, images, and network created by the playbook
+  hosts: localhost
+  become: true
+  tasks:
+
+    - name: Stop all WordPress, MySQL, and nginx-proxy containers
+      docker_container:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - wordpress
+        - wp_db
+        - nginx-proxy
+        - nginx-proxy-le
+
+    - name: Remove all WordPress, MySQL, and nginx-proxy containers
+      docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - wordpress
+        - wp_db
+        - nginx-proxy
+        - nginx-proxy-le
+
+    - name: Remove the WordPress Docker image
+      docker_image:
+        name: wordpress
+        state: absent
+
+    - name: Remove the MySQL Docker image
+      docker_image:
+        name: mysql
+        state: absent
+
+    - name: Remove the nginx-proxy Docker image
+      docker_image:
+        name: jwilder/nginx-proxy
+        state: absent
+
+    - name: Remove the letsencrypt-nginx-proxy-companion Docker image
+      docker_image:
+        name: jrcs/letsencrypt-nginx-proxy-companion
+        state: absent
+
+    - name: Remove Docker network 'nginx-proxy'
+      docker_network:
+        name: nginx-proxy
+        state: absent
