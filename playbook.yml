@@ -1,0 +1,36 @@
+- name: Deploy WordPress and DB in Docker
+  hosts: localhost
+  become: true
+  vars_files:
+    - .vars.yaml
+  tasks:
+
+    - name: Start MySQL container
+      docker_container:
+        name: wp_db
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: "{{ wordpress_db_name }}"
+          MYSQL_USER: "{{ db_user }}"
+          MYSQL_PASSWORD: "{{ db_pass }}"
+          MYSQL_ROOT_PASSWORD: "{{ db_root_pass }}"
+        ports:
+          - "3306:3306"
+        state: started
+        restart_policy: always
+
+    - name: Start WordPress container
+      docker_container:
+        name: wordpress
+        image: wordpress:latest
+        env:
+          WORDPRESS_DB_HOST: wp_db:3306
+          WORDPRESS_DB_NAME: "{{ wordpress_db_name }}"
+          WORDPRESS_DB_USER: "{{ db_user }}"
+          WORDPRESS_DB_PASSWORD: "{{ db_pass }}"
+        ports:
+          - "{{ wordpress_port }}:80"
+        links:
+          - wp_db
+        state: started
+        restart_policy: always

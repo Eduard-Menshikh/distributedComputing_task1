@@ -1,0 +1,6 @@
+is_wordpress: true
+wordpress_port: 8090
+wordpress_db_name: wp_db
+db_user: wp_user
+db_pass: wp_pass
+db_root_pass: root_pass
